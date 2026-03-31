@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reddit Comment Collector Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: #f8fafc; }
+    .sticky-head thead th {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #fff;
+    }
+    /* 테이블 레이아웃 고정 및 작성자 열 너비 통일 */
+    .comment-table {
+      table-layout: fixed;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    /* 작성자 칸 폭을 기존 대비 50% 축소 (모바일 55px, 데스크톱 80px) */
+    .col-author {
+      width: 55px; /* 모바일 기본 */
+      min-width: 55px;
+      max-width: 55px;
+      word-break: break-all;
+    }
+    @media (min-width: 640px) {
+      .col-author {
+        width: 80px; /* 데스크톱 */
+        min-width: 80px;
+        max-width: 80px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+  <div class="max-w-7xl mx-auto p-4 md:p-8">
+    <div class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
+      <!-- Header -->
+      <div class="p-6 md:p-8 border-b border-slate-200 bg-gradient-to-r from-orange-50 via-white to-white">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-orange-500 text-white flex items-center justify-center shadow-sm">
+              <i data-lucide="message-square-more" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Reddit Comment Collector Pro</h1>
+              <p class="text-slate-500 mt-1 text-sm md:text-base">
+                Reddit 게시물 URL을 입력하여 본문과 모든 계층의 댓글을 수집하세요.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-[400px_1fr]">
+        <!-- Left panel -->
+        <aside class="border-r border-slate-200 p-6 space-y-6 bg-slate-50/50">
+          <section class="space-y-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="link-2" class="w-5 h-5 text-orange-500"></i>
+              <h2 class="font-bold text-lg">Reddit URL 입력</h2>
+            </div>
+
+            <div class="space-y-3" id="url-container">
+              <input type="text" class="url-field w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-500" placeholder="첫 번째 URL 입력">
+              <input type="text" class="url-field w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-500" placeholder="두 번째 URL 입력">
+              <input type="text" class="url-field w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-500" placeholder="세 번째 URL 입력">
+              <input type="text" class="url-field w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-500" placeholder="네 번째 URL 입력">
+              <input type="text" class="url-field w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-500" placeholder="다섯 번째 URL 입력">
+            </div>
+          </section>
+
+          <section class="space-y-3">
+            <!-- 버튼 레이아웃 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
+              <button id="run-btn" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold px-2 py-4 shadow-sm transition disabled:bg-slate-300">
+                <i data-lucide="play" class="w-5 h-5"></i>
+                <span id="run-btn-text" class="text-sm md:text-base">수집 시작</span>
+              </button>
+              
+              <div class="grid grid-cols-2 gap-2">
+                <button id="download-csv-btn" disabled class="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 hover:bg-black text-white font-bold px-1 py-4 transition disabled:bg-slate-300 shadow-sm">
+                  <i data-lucide="file-down" class="w-4 h-4"></i>
+                  <span class="text-[10px] md:text-xs whitespace-nowrap">엑셀 저장(CSV)</span>
+                </button>
+                <button id="copy-btn" disabled class="inline-flex items-center justify-center gap-2 rounded-2xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 font-bold px-1 py-4 transition disabled:opacity-50 shadow-sm">
+                  <i data-lucide="copy" class="w-4 h-4"></i>
+                  <span class="text-[10px] md:text-xs whitespace-nowrap">클립보드 복사</span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="space-y-3 pt-2">
+            <div class="flex items-center gap-2">
+              <i data-lucide="activity" class="w-5 h-5 text-orange-500"></i>
+              <h2 class="font-bold text-lg">수집 요약</h2>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-4 rounded-2xl border border-slate-200 bg-white">
+                <div class="text-xs text-slate-500">처리 URL</div>
+                <div id="stat-urls" class="text-2xl font-extrabold mt-1">0</div>
+              </div>
+              <div class="p-4 rounded-2xl border border-slate-200 bg-white">
+                <div class="text-xs text-slate-500">총 댓글</div>
+                <div id="stat-comments" class="text-2xl font-extrabold mt-1">0</div>
+              </div>
+            </div>
+          </section>
+        </aside>
+
+        <!-- Right panel -->
+        <main class="p-6 md:p-8 space-y-6">
+          <section class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <h2 class="text-xl font-extrabold">수집 결과</h2>
+            <span id="status-badge" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold border border-slate-200">
+              대기 중
+            </span>
+          </section>
+
+          <section id="status-list" class="grid grid-cols-1 gap-4"></section>
+          <section id="results-list" class="space-y-6"></section>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    const runBtn = document.getElementById('run-btn');
+    const runBtnText = document.getElementById('run-btn-text');
+    const downloadCsvBtn = document.getElementById('download-csv-btn');
+    const copyBtn = document.getElementById('copy-btn');
+    const statUrls = document.getElementById('stat-urls');
+    const statComments = document.getElementById('stat-comments');
+    const statusBadge = document.getElementById('status-badge');
+    const statusList = document.getElementById('status-list');
+    const resultsList = document.getElementById('results-list');
+
+    let appState = {
+      running: false,
+      items: [],
+      flatRows: [],
+      summary: { inputCount: 0, successCount: 0, failCount: 0, totalComments: 0 }
+    };
+
+    function nowText() { return new Date().toLocaleString('ko-KR'); }
+    function formatEpoch(epochSec) {
+      if (!epochSec) return '';
+      const d = new Date(epochSec * 1000);
+      return isNaN(d.getTime()) ? '' : d.toLocaleString('ko-KR');
+    }
+    function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+    function setBadge(text, tone = 'neutral') {
+      const toneMap = {
+        neutral: 'bg-slate-100 text-slate-600 border-slate-200',
+        running: 'bg-blue-50 text-blue-700 border-blue-100',
+        success: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+        danger: 'bg-red-50 text-red-700 border-red-100'
+      };
+      statusBadge.className = `inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${toneMap[tone]}`;
+      statusBadge.textContent = text;
+    }
+
+    function updateStats() {
+      statUrls.textContent = String(appState.summary.inputCount);
+      statComments.textContent = String(appState.summary.totalComments);
+      const hasData = appState.items.length > 0;
+      downloadCsvBtn.disabled = !hasData;
+      copyBtn.disabled = !hasData;
+    }
+
+    function resetAppState() {
+      appState = { running: false, items: [], flatRows: [], summary: { inputCount: 0, successCount: 0, failCount: 0, totalComments: 0 } };
+      statusList.innerHTML = '';
+      resultsList.innerHTML = '';
+      updateStats();
+      setBadge('대기 중', 'neutral');
+    }
+
+    function normalizeRedditPostUrl(input) {
+      const raw = String(input || '').trim();
+      if (!raw) return null;
+      try {
+        const url = new URL(raw);
+        const host = url.hostname.replace(/^m\./, '').toLowerCase();
+        if (host === 'redd.it') {
+          const postId = url.pathname.replace(/^\/+|\/+$/g, '');
+          return { canonicalUrl: `https://www.reddit.com/comments/${postId}`, postId };
+        }
+        let match = url.pathname.match(/\/comments\/([a-z0-9]+)(?:\/|$)/i) || url.pathname.match(/\/r\/[^/]+\/comments\/([a-z0-9]+)(?:\/|$)/i);
+        if (!match) return null;
+        return { canonicalUrl: `https://www.reddit.com/comments/${match[1]}`, postId: match[1] };
+      } catch { return null; }
+    }
+
+    async function fetchJsonWithFallback(targetUrl) {
+      const proxies = [
+        targetUrl,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`
+      ];
+      for (const url of proxies) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) return await res.json();
+        } catch {}
+      }
+      throw new Error('데이터를 가져올 수 없습니다.');
+    }
+
+    function parseThingList(children, acc = [], moreBuckets = []) {
+      if (!Array.isArray(children)) return { comments: acc, moreBuckets };
+      for (const child of children) {
+        if (child.kind === 't1') {
+          const d = child.data || {};
+          acc.push({
+            id: d.id, parent_id: d.parent_id, author: d.author || '[deleted]',
+            body: d.body || '', score: d.score || 0, created_utc: d.created_utc, depth: d.depth || 0
+          });
+          if (d.replies && d.replies.data) parseThingList(d.replies.data.children, acc, moreBuckets);
+        } else if (child.kind === 'more') {
+          const d = child.data || {};
+          if (d.children && d.children.length > 0) moreBuckets.push({ parent_id: d.parent_id, children: d.children });
+        }
+      }
+      return { comments: acc, moreBuckets };
+    }
+
+    async function fetchMoreChildren(postId, moreBuckets) {
+      const collected = [];
+      const queue = [...moreBuckets];
+      while (queue.length > 0) {
+        const bucket = queue.shift();
+        const url = `https://www.reddit.com/api/morechildren.json?api_type=json&raw_json=1&link_id=t3_${postId}&children=${bucket.children.slice(0, 50).join(',')}`;
+        try {
+          const data = await fetchJsonWithFallback(url);
+          const things = data?.json?.data?.things;
+          if (Array.isArray(things)) {
+            const parsed = parseThingList(things, [], []);
+            collected.push(...parsed.comments);
+            if (parsed.moreBuckets.length > 0) queue.push(...parsed.moreBuckets);
+          }
+          await sleep(300);
+        } catch {}
+      }
+      return collected;
+    }
+
+    async function collect(rawUrl) {
+      const norm = normalizeRedditPostUrl(rawUrl);
+      if (!norm) throw new Error('올바른 URL이 아닙니다.');
+      const data = await fetchJsonWithFallback(`${norm.canonicalUrl}.json?raw_json=1&limit=500&depth=100&sort=best`);
+      const postNode = data?.[0]?.data?.children?.[0]?.data;
+      const parsed = parseThingList(data?.[1]?.data?.children || [], [], []);
+      let comments = [...parsed.comments];
+      if (parsed.moreBuckets.length > 0) {
+        const extra = await fetchMoreChildren(postNode.id, parsed.moreBuckets);
+        comments.push(...extra);
+      }
+      return {
+        title: postNode.title, 
+        body: postNode.selftext || "", 
+        author: postNode.author, 
+        subreddit: postNode.subreddit,
+        comments: comments, 
+        url: rawUrl
+      };
+    }
+
+    function renderResult(item) {
+      const wrap = document.createElement('div');
+      wrap.className = 'rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden p-4 md:p-6';
+      wrap.innerHTML = `
+        <div class="flex flex-col gap-4 mb-4">
+          <div>
+            <h3 class="font-extrabold text-lg leading-tight">${item.title}</h3>
+            <p class="text-xs text-slate-500 mt-1">r/${item.subreddit} · 작성자: ${item.author} · 댓글: ${item.comments.length}개</p>
+          </div>
+          ${item.body ? `
+            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 text-xs md:text-sm text-slate-700 whitespace-pre-wrap break-words italic">
+              <strong class="block mb-1 not-italic text-slate-900">[게시물 본문 내용]</strong>
+              ${item.body}
+            </div>
+          ` : ''}
+        </div>
+        <div class="overflow-x-auto border rounded-xl scrollbar-thin">
+          <table class="comment-table text-sm text-left">
+            <thead class="bg-slate-50 text-slate-500 text-[10px] md:text-xs uppercase font-bold">
+              <tr>
+                <th class="col-author px-2 py-3 md:px-4">작성자</th>
+                <th class="px-2 py-3 md:px-4">내용</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${item.comments.slice(0, 50).map(c => `
+                <tr class="border-t">
+                  <td class="col-author px-2 py-3 md:px-4 font-bold text-[11px] md:text-xs align-top">${c.author}</td>
+                  <td class="px-2 py-3 md:px-4 text-[12px] md:text-xs text-slate-700 align-top">
+                    <div style="margin-left: ${c.depth * 8}px" class="${c.depth > 0 ? 'border-l-2 border-slate-200 pl-2' : ''} break-words whitespace-pre-wrap">${c.body}</div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        ${item.comments.length > 50 ? `<p class="mt-2 text-[10px] text-slate-400 text-center">* 상위 50개 댓글만 미리보기 중입니다. 전체 데이터는 엑셀로 저장하세요.</p>` : ''}
+      `;
+      resultsList.appendChild(wrap);
+    }
+
+    async function run() {
+      const inputs = Array.from(document.querySelectorAll('.url-field')).map(i => i.value.trim()).filter(Boolean);
+      if (!inputs.length) return;
+      resetAppState();
+      appState.running = true;
+      runBtn.disabled = true;
+      runBtnText.textContent = "수집 중...";
+      setBadge('수집 중...', 'running');
+      appState.summary.inputCount = inputs.length;
+
+      for (const url of inputs) {
+        try {
+          const res = await collect(url);
+          appState.items.push(res);
+          appState.summary.successCount++;
+          appState.summary.totalComments += res.comments.length;
+          renderResult(res);
+        } catch (e) {
+          appState.summary.failCount++;
+        }
+        updateStats();
+      }
+      runBtn.disabled = false;
+      runBtnText.textContent = "수집 시작";
+      setBadge('완료', 'success');
+      lucide.createIcons();
+    }
+
+    function getCsvString() {
+      if (!appState.items.length) return "";
+      
+      // 1. 최상단 수집 대상 URL 목록
+      let output = "### 수집 조사한 URL 목록 ###\n";
+      const sourceUrls = appState.items.map(item => item.url).filter(Boolean);
+      output += sourceUrls.join("\n") + "\n\n";
+
+      // 2. 게시물별 본문 먼저 표시 후 댓글 리스트 배치
+      appState.items.forEach((item, idx) => {
+        output += `================================================================================\n`;
+        output += `게시물 #${idx + 1} 정보 요약\n`;
+        output += `================================================================================\n`;
+        output += `제목:,"${String(item.title).replace(/"/g, '""')}"\n`;
+        output += `작성자:,${item.author}\n`;
+        output += `서브레딧:,r/${item.subreddit}\n`;
+        output += `본문 URL:,${item.url}\n`;
+        output += `[게시물 본문 내용]:\n"${String(item.body).replace(/"/g, '""')}"\n\n`;
+        
+        output += `[해당 게시물의 댓글 리스트 (총 ${item.comments.length}개)]\n`;
+        output += "작성자,계층(Depth),작성시각,댓글내용\n";
+        
+        item.comments.forEach(c => {
+          const timeStr = formatEpoch(c.created_utc);
+          output += `"${c.author}",${c.depth},"${timeStr}","${String(c.body).replace(/"/g, '""')}"\n`;
+        });
+        output += "\n\n";
+      });
+      
+      return output;
+    }
+
+    function exportCsv() {
+      const csv = getCsvString();
+      if (!csv) return;
+      const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `reddit_collector_result_${Date.now()}.csv`;
+      link.click();
+    }
+
+    function copyToClipboard() {
+      const csv = getCsvString();
+      if (!csv) return;
+      
+      const textArea = document.createElement("textarea");
+      textArea.value = csv;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-9999px";
+      textArea.style.top = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        const originalText = copyBtn.querySelector('span').textContent;
+        copyBtn.querySelector('span').textContent = successful ? "복사 완료!" : "복사 실패";
+        setTimeout(() => {
+          copyBtn.querySelector('span').textContent = originalText;
+        }, 2000);
+      } catch (err) {
+        console.error('클립보드 복사 실패:', err);
+      }
+      
+      document.body.removeChild(textArea);
+    }
+
+    runBtn.addEventListener('click', run);
+    downloadCsvBtn.addEventListener('click', exportCsv);
+    copyBtn.addEventListener('click', copyToClipboard);
+  </script>
+</body>
+</html>
