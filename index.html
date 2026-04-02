@@ -3,135 +3,127 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reddit Comment Collector Pro</title>
+  <title>REDDIT voice collector</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-    body { font-family: 'Inter', sans-serif; }
-    .scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
-    .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-    .scrollbar-thin::-webkit-scrollbar-track { background: #f8fafc; }
-    .sticky-head thead th {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: #fff;
-    }
-    /* 테이블 레이아웃 고정 및 작성자 열 너비 통일 */
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    
+    /* 스크롤바 커스텀 */
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+    
+    /* 격자형 테이블 레이아웃 및 작성자 폭 고정 */
     .comment-table {
       table-layout: fixed;
       width: 100%;
       border-collapse: collapse;
+      background-color: white;
     }
-    /* 작성자 칸 폭을 기존 대비 50% 축소 (모바일 55px, 데스크톱 80px) */
+    .comment-table th, .comment-table td {
+      border: 1px solid #e2e8f0;
+      padding: 10px 8px;
+      vertical-align: top;
+      word-break: break-all;
+    }
     .col-author {
-      width: 55px; /* 모바일 기본 */
+      width: 55px; /* 모바일 기준 50% 축소 폭 */
       min-width: 55px;
       max-width: 55px;
-      word-break: break-all;
+      font-weight: 700;
+      font-size: 14px; /* 최소 폰트 사이즈 준수 */
+      color: #1e293b;
     }
     @media (min-width: 640px) {
       .col-author {
-        width: 80px; /* 데스크톱 */
+        width: 80px; /* 데스크톱 기준 50% 축소 폭 */
         min-width: 80px;
         max-width: 80px;
+        font-size: 14px;
       }
     }
+    
+    /* 헤더 디자인: 곡선을 지우고 직선으로 변경 */
+    .header-rect {
+      border-bottom-left-radius: 0px;
+      border-bottom-right-radius: 0px;
+    }
+    
+    /* 그림자 효과 */
+    .card-shadow { box-shadow: 0 4px 25px rgba(0,0,0,0.06); }
+    .btn-active:active { transform: scale(0.98); }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen">
-  <div class="max-w-7xl mx-auto p-4 md:p-8">
-    <div class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
-      <!-- Header -->
-      <div class="p-6 md:p-8 border-b border-slate-200 bg-gradient-to-r from-orange-50 via-white to-white">
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div class="flex items-start gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-orange-500 text-white flex items-center justify-center shadow-sm">
-              <i data-lucide="message-square-more" class="w-6 h-6"></i>
-            </div>
-            <div>
-              <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Reddit Comment Collector Pro</h1>
-              <p class="text-slate-500 mt-1 text-sm md:text-base">
-                Reddit 게시물 URL을 입력하여 본문과 모든 계층의 댓글을 수집하세요.
-              </p>
-            </div>
-          </div>
+<body class="text-slate-900 min-h-screen pb-10">
+
+  <!-- 상단 헤더: 직선 형태로 수정하여 균형 확보 -->
+  <header class="max-w-xl mx-auto bg-[#d32f2f] text-white pt-10 pb-12 px-6 header-rect shadow-lg text-center">
+    <div class="inline-flex p-3 bg-white/20 rounded-2xl mb-4">
+      <i data-lucide="message-square-more" class="w-10 h-10"></i>
+    </div>
+    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight uppercase">REDDIT voice collector</h1>
+    <p class="text-sm opacity-80 mt-2 font-medium">모바일 최적화 · 게시물 본문 및 모든 계층 수집</p>
+  </header>
+
+  <main class="max-w-xl mx-auto mt-6 px-4 space-y-6">
+    
+    <!-- URL 입력 섹션 -->
+    <section class="bg-white rounded-[32px] p-6 card-shadow border border-slate-100">
+      <div class="flex items-center gap-3 mb-6">
+        <h2 class="font-bold text-lg text-slate-800">Reddit URL 입력</h2>
+      </div>
+
+      <div class="space-y-3" id="url-container">
+        <input type="text" class="url-field w-full rounded-2xl border-none bg-slate-50 px-4 py-4 text-sm shadow-inner focus:ring-2 focus:ring-[#d32f2f] outline-none transition-all" placeholder="첫 번째 URL 입력">
+        <input type="text" class="url-field w-full rounded-2xl border-none bg-slate-50 px-4 py-4 text-sm shadow-inner focus:ring-2 focus:ring-[#d32f2f] outline-none transition-all" placeholder="두 번째 URL 입력">
+        <input type="text" class="url-field w-full rounded-2xl border-none bg-slate-50 px-4 py-4 text-sm shadow-inner focus:ring-2 focus:ring-[#d32f2f] outline-none transition-all" placeholder="세 번째 URL 입력">
+        <input type="text" class="url-field w-full rounded-2xl border-none bg-slate-50 px-4 py-4 text-sm shadow-inner focus:ring-2 focus:ring-[#d32f2f] outline-none transition-all" placeholder="네 번째 URL 입력">
+        <input type="text" class="url-field w-full rounded-2xl border-none bg-slate-50 px-4 py-4 text-sm shadow-inner focus:ring-2 focus:ring-[#d32f2f] outline-none transition-all" placeholder="다섯 번째 URL 입력">
+      </div>
+
+      <!-- 수집 요약 정보 -->
+      <div class="mt-8 pt-6 border-t border-slate-100 grid grid-cols-2 gap-4 text-center">
+        <div class="bg-slate-50/50 p-3 rounded-2xl">
+          <div class="text-sm text-slate-400 font-bold uppercase tracking-wider">처리 URL</div>
+          <div id="stat-urls" class="text-xl font-black text-slate-800">0</div>
+        </div>
+        <div class="bg-slate-50/50 p-3 rounded-2xl">
+          <div class="text-sm text-slate-400 font-bold uppercase tracking-wider">총 댓글</div>
+          <div id="stat-comments" class="text-xl font-black text-slate-800">0</div>
         </div>
       </div>
+    </section>
 
-      <div class="grid grid-cols-1 xl:grid-cols-[400px_1fr]">
-        <!-- Left panel -->
-        <aside class="border-r border-slate-200 p-6 space-y-6 bg-slate-50/50">
-          <section class="space-y-4">
-            <div class="flex items-center gap-2">
-              <i data-lucide="link-2" class="w-5 h-5 text-orange-500"></i>
-              <h2 class="font-bold text-lg">Reddit URL 입력</h2>
-            </div>
-
-            <div class="space-y-3" id="url-container">
-              <input type="text" class="url-field w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-500" placeholder="첫 번째 URL 입력">
-              <input type="text" class="url-field w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-500" placeholder="두 번째 URL 입력">
-              <input type="text" class="url-field w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-500" placeholder="세 번째 URL 입력">
-              <input type="text" class="url-field w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-500" placeholder="네 번째 URL 입력">
-              <input type="text" class="url-field w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-500" placeholder="다섯 번째 URL 입력">
-            </div>
-          </section>
-
-          <section class="space-y-3">
-            <!-- 버튼 레이아웃 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
-              <button id="run-btn" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold px-2 py-4 shadow-sm transition disabled:bg-slate-300">
-                <i data-lucide="play" class="w-5 h-5"></i>
-                <span id="run-btn-text" class="text-sm md:text-base">수집 시작</span>
-              </button>
-              
-              <div class="grid grid-cols-2 gap-2">
-                <button id="download-csv-btn" disabled class="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 hover:bg-black text-white font-bold px-1 py-4 transition disabled:bg-slate-300 shadow-sm">
-                  <i data-lucide="file-down" class="w-4 h-4"></i>
-                  <span class="text-[10px] md:text-xs whitespace-nowrap">엑셀 저장(CSV)</span>
-                </button>
-                <button id="copy-btn" disabled class="inline-flex items-center justify-center gap-2 rounded-2xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 font-bold px-1 py-4 transition disabled:opacity-50 shadow-sm">
-                  <i data-lucide="copy" class="w-4 h-4"></i>
-                  <span class="text-[10px] md:text-xs whitespace-nowrap">클립보드 복사</span>
-                </button>
-              </div>
-            </div>
-          </section>
-
-          <section class="space-y-3 pt-2">
-            <div class="flex items-center gap-2">
-              <i data-lucide="activity" class="w-5 h-5 text-orange-500"></i>
-              <h2 class="font-bold text-lg">수집 요약</h2>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div class="p-4 rounded-2xl border border-slate-200 bg-white">
-                <div class="text-xs text-slate-500">처리 URL</div>
-                <div id="stat-urls" class="text-2xl font-extrabold mt-1">0</div>
-              </div>
-              <div class="p-4 rounded-2xl border border-slate-200 bg-white">
-                <div class="text-xs text-slate-500">총 댓글</div>
-                <div id="stat-comments" class="text-2xl font-extrabold mt-1">0</div>
-              </div>
-            </div>
-          </section>
-        </aside>
-
-        <!-- Right panel -->
-        <main class="p-6 md:p-8 space-y-6">
-          <section class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <h2 class="text-xl font-extrabold">수집 결과</h2>
-            <span id="status-badge" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold border border-slate-200">
-              대기 중
-            </span>
-          </section>
-
-          <section id="status-list" class="grid grid-cols-1 gap-4"></section>
-          <section id="results-list" class="space-y-6"></section>
-        </main>
+    <!-- 액션 버튼 섹션 -->
+    <div class="space-y-3">
+      <button id="run-btn" class="w-full inline-flex items-center justify-center gap-3 rounded-2xl bg-[#d32f2f] hover:bg-[#b71c1c] text-white font-bold py-5 shadow-lg shadow-red-100 transition-all btn-active disabled:bg-slate-300">
+        <i data-lucide="play" class="w-6 h-6"></i>
+        <span id="run-btn-text" class="text-sm md:text-base">수집 시작</span>
+      </button>
+      
+      <div class="grid grid-cols-2 gap-3">
+        <button id="download-csv-btn" disabled class="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 hover:bg-black text-white font-bold py-5 transition-all btn-active disabled:bg-slate-300 shadow-md">
+          <i data-lucide="file-down" class="w-4 h-4"></i>
+          <span class="text-sm md:text-base">엑셀 저장(CSV)</span>
+        </button>
+        <button id="copy-btn" disabled class="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold py-5 transition-all btn-active disabled:opacity-50 shadow-md">
+          <i data-lucide="copy" class="w-4 h-4"></i>
+          <span class="text-sm md:text-base">클립보드 복사</span>
+        </button>
       </div>
     </div>
-  </div>
+
+    <!-- 결과 리스트 섹션 -->
+    <div id="results-container" class="space-y-6 pt-2">
+      <div class="flex items-center justify-between px-2">
+        <h2 class="text-lg font-black text-slate-800">수집 결과</h2>
+        <span id="status-badge" class="px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-sm font-bold border border-slate-200 uppercase">대기 중</span>
+      </div>
+      <div id="results-list" class="space-y-6"></div>
+    </div>
+
+  </main>
 
   <script>
     lucide.createIcons();
@@ -143,13 +135,11 @@
     const statUrls = document.getElementById('stat-urls');
     const statComments = document.getElementById('stat-comments');
     const statusBadge = document.getElementById('status-badge');
-    const statusList = document.getElementById('status-list');
     const resultsList = document.getElementById('results-list');
 
     let appState = {
       running: false,
       items: [],
-      flatRows: [],
       summary: { inputCount: 0, successCount: 0, failCount: 0, totalComments: 0 }
     };
 
@@ -163,12 +153,12 @@
 
     function setBadge(text, tone = 'neutral') {
       const toneMap = {
-        neutral: 'bg-slate-100 text-slate-600 border-slate-200',
+        neutral: 'bg-slate-100 text-slate-500 border-slate-200',
         running: 'bg-blue-50 text-blue-700 border-blue-100',
         success: 'bg-emerald-50 text-emerald-700 border-emerald-100',
         danger: 'bg-red-50 text-red-700 border-red-100'
       };
-      statusBadge.className = `inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${toneMap[tone]}`;
+      statusBadge.className = `px-3 py-1 rounded-full text-sm font-bold border ${toneMap[tone]} uppercase`;
       statusBadge.textContent = text;
     }
 
@@ -181,8 +171,7 @@
     }
 
     function resetAppState() {
-      appState = { running: false, items: [], flatRows: [], summary: { inputCount: 0, successCount: 0, failCount: 0, totalComments: 0 } };
-      statusList.innerHTML = '';
+      appState = { running: false, items: [], summary: { inputCount: 0, successCount: 0, failCount: 0, totalComments: 0 } };
       resultsList.innerHTML = '';
       updateStats();
       setBadge('대기 중', 'neutral');
@@ -215,7 +204,7 @@
           if (res.ok) return await res.json();
         } catch {}
       }
-      throw new Error('데이터를 가져올 수 없습니다.');
+      throw new Error('데이터 응답 오류');
     }
 
     function parseThingList(children, acc = [], moreBuckets = []) {
@@ -250,7 +239,7 @@
             collected.push(...parsed.comments);
             if (parsed.moreBuckets.length > 0) queue.push(...parsed.moreBuckets);
           }
-          await sleep(300);
+          await sleep(350);
         } catch {}
       }
       return collected;
@@ -258,7 +247,7 @@
 
     async function collect(rawUrl) {
       const norm = normalizeRedditPostUrl(rawUrl);
-      if (!norm) throw new Error('올바른 URL이 아닙니다.');
+      if (!norm) throw new Error('잘못된 URL');
       const data = await fetchJsonWithFallback(`${norm.canonicalUrl}.json?raw_json=1&limit=500&depth=100&sort=best`);
       const postNode = data?.[0]?.data?.children?.[0]?.data;
       const parsed = parseThingList(data?.[1]?.data?.children || [], [], []);
@@ -268,52 +257,43 @@
         comments.push(...extra);
       }
       return {
-        title: postNode.title, 
-        body: postNode.selftext || "", 
-        author: postNode.author, 
-        subreddit: postNode.subreddit,
-        comments: comments, 
-        url: rawUrl
+        title: postNode.title, body: postNode.selftext || "", author: postNode.author, 
+        subreddit: postNode.subreddit, comments: comments, url: rawUrl
       };
     }
 
     function renderResult(item) {
       const wrap = document.createElement('div');
-      wrap.className = 'rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden p-4 md:p-6';
+      wrap.className = 'bg-white rounded-[32px] p-5 card-shadow border border-slate-100 overflow-hidden';
       wrap.innerHTML = `
-        <div class="flex flex-col gap-4 mb-4">
-          <div>
-            <h3 class="font-extrabold text-lg leading-tight">${item.title}</h3>
-            <p class="text-xs text-slate-500 mt-1">r/${item.subreddit} · 작성자: ${item.author} · 댓글: ${item.comments.length}개</p>
-          </div>
-          ${item.body ? `
-            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 text-xs md:text-sm text-slate-700 whitespace-pre-wrap break-words italic">
-              <strong class="block mb-1 not-italic text-slate-900">[게시물 본문 내용]</strong>
-              ${item.body}
-            </div>
-          ` : ''}
+        <div class="mb-4">
+          <h3 class="font-black text-base text-slate-800 leading-snug">${item.title}</h3>
+          <p class="text-sm text-slate-400 font-bold mt-1 uppercase tracking-tight">r/${item.subreddit} · @${item.author} · 댓글 ${item.comments.length}개</p>
         </div>
-        <div class="overflow-x-auto border rounded-xl scrollbar-thin">
-          <table class="comment-table text-sm text-left">
-            <thead class="bg-slate-50 text-slate-500 text-[10px] md:text-xs uppercase font-bold">
-              <tr>
-                <th class="col-author px-2 py-3 md:px-4">작성자</th>
-                <th class="px-2 py-3 md:px-4">내용</th>
-              </tr>
+        ${item.body ? `
+          <div class="bg-slate-50 border border-slate-200/50 rounded-2xl p-3 text-sm text-slate-600 mb-4 whitespace-pre-wrap break-words italic">
+            <strong class="block mb-1 not-italic text-[#d32f2f]">[게시물 본문]</strong>
+            ${item.body}
+          </div>
+        ` : ''}
+        <div class="overflow-x-auto scrollbar-thin border border-slate-100 rounded-xl">
+          <table class="comment-table">
+            <thead class="bg-slate-50/50 text-slate-400 text-sm uppercase font-black">
+              <tr><th class="col-author text-left">작성자</th><th class="text-left">내용</th></tr>
             </thead>
-            <tbody>
-              ${item.comments.slice(0, 50).map(c => `
-                <tr class="border-t">
-                  <td class="col-author px-2 py-3 md:px-4 font-bold text-[11px] md:text-xs align-top">${c.author}</td>
-                  <td class="px-2 py-3 md:px-4 text-[12px] md:text-xs text-slate-700 align-top">
-                    <div style="margin-left: ${c.depth * 8}px" class="${c.depth > 0 ? 'border-l-2 border-slate-200 pl-2' : ''} break-words whitespace-pre-wrap">${c.body}</div>
+            <tbody class="text-sm">
+              ${item.comments.slice(0, 30).map(c => `
+                <tr>
+                  <td class="col-author text-slate-900">${c.author}</td>
+                  <td class="text-slate-700">
+                    <div style="margin-left: ${Math.min(c.depth * 6, 40)}px" class="${c.depth > 0 ? 'border-l-2 border-slate-200 pl-2' : ''} whitespace-pre-wrap">${c.body}</div>
                   </td>
                 </tr>
               `).join('')}
             </tbody>
           </table>
         </div>
-        ${item.comments.length > 50 ? `<p class="mt-2 text-[10px] text-slate-400 text-center">* 상위 50개 댓글만 미리보기 중입니다. 전체 데이터는 엑셀로 저장하세요.</p>` : ''}
+        ${item.comments.length > 30 ? `<p class="mt-3 text-sm text-slate-300 text-center font-bold italic">* 상위 30개 댓글 미리보기 중</p>` : ''}
       `;
       resultsList.appendChild(wrap);
     }
@@ -342,39 +322,17 @@
       }
       runBtn.disabled = false;
       runBtnText.textContent = "수집 시작";
-      setBadge('완료', 'success');
+      setBadge('작업 완료', 'success');
       lucide.createIcons();
     }
 
     function getCsvString() {
       if (!appState.items.length) return "";
-      
-      // 1. 최상단 수집 대상 URL 목록
-      let output = "### 수집 조사한 URL 목록 ###\n";
-      const sourceUrls = appState.items.map(item => item.url).filter(Boolean);
-      output += sourceUrls.join("\n") + "\n\n";
-
-      // 2. 게시물별 본문 먼저 표시 후 댓글 리스트 배치
+      let output = "### 수집 조사한 URL 목록 ###\n" + appState.items.map(i => i.url).join("\n") + "\n\n";
       appState.items.forEach((item, idx) => {
-        output += `================================================================================\n`;
-        output += `게시물 #${idx + 1} 정보 요약\n`;
-        output += `================================================================================\n`;
-        output += `제목:,"${String(item.title).replace(/"/g, '""')}"\n`;
-        output += `작성자:,${item.author}\n`;
-        output += `서브레딧:,r/${item.subreddit}\n`;
-        output += `본문 URL:,${item.url}\n`;
-        output += `[게시물 본문 내용]:\n"${String(item.body).replace(/"/g, '""')}"\n\n`;
-        
-        output += `[해당 게시물의 댓글 리스트 (총 ${item.comments.length}개)]\n`;
-        output += "작성자,계층(Depth),작성시각,댓글내용\n";
-        
-        item.comments.forEach(c => {
-          const timeStr = formatEpoch(c.created_utc);
-          output += `"${c.author}",${c.depth},"${timeStr}","${String(c.body).replace(/"/g, '""')}"\n`;
-        });
-        output += "\n\n";
+        output += `[게시물 #${idx + 1} 정보]\n제목:,"${item.title.replace(/"/g, '""')}"\n작성자:,${item.author}\nURL:,${item.url}\n[본문 내용]:\n"${item.body.replace(/"/g, '""')}"\n\n`;
+        output += `[댓글 리스트]\n작성자,계층,내용\n` + item.comments.map(c => `"${c.author}",${c.depth},"${c.body.replace(/"/g, '""')}"`).join("\n") + "\n\n";
       });
-      
       return output;
     }
 
@@ -384,35 +342,23 @@
       const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `reddit_collector_result_${Date.now()}.csv`;
+      link.download = `reddit_data_${Date.now()}.csv`;
       link.click();
     }
 
     function copyToClipboard() {
       const csv = getCsvString();
       if (!csv) return;
-      
-      const textArea = document.createElement("textarea");
-      textArea.value = csv;
-      textArea.style.position = "fixed";
-      textArea.style.left = "-9999px";
-      textArea.style.top = "0";
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      
+      const t = document.createElement("textarea");
+      t.value = csv; t.style.position = "fixed"; t.style.left = "-9999px";
+      document.body.appendChild(t); t.select();
       try {
-        const successful = document.execCommand('copy');
-        const originalText = copyBtn.querySelector('span').textContent;
-        copyBtn.querySelector('span').textContent = successful ? "복사 완료!" : "복사 실패";
-        setTimeout(() => {
-          copyBtn.querySelector('span').textContent = originalText;
-        }, 2000);
-      } catch (err) {
-        console.error('클립보드 복사 실패:', err);
-      }
-      
-      document.body.removeChild(textArea);
+        document.execCommand('copy');
+        const oldText = copyBtn.querySelector('span').textContent;
+        copyBtn.querySelector('span').textContent = "복사 완료!";
+        setTimeout(() => { copyBtn.querySelector('span').textContent = oldText; }, 2000);
+      } catch (err) {}
+      document.body.removeChild(t);
     }
 
     runBtn.addEventListener('click', run);
