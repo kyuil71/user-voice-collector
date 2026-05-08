@@ -20,7 +20,7 @@
             <p class="text-red-50 text-sm font-semibold opacity-95">모바일 최적화 · 댓글 최대 1000개 수집</p>
         </header>
 
-        <main class="flex-grow p-6 space-y-8 bg-white/50 relative z-0 overflow-y-auto">
+        <main class="flex-grow p-6 space-y-8 bg-white/50 relative z-0 overflow-y-auto pb-10 sm:pb-8 sm:rounded-b-[2.5rem]">
             
             <section class="space-y-4">
                 <div class="flex items-center gap-3 mb-1">
@@ -36,46 +36,44 @@
                 </div>
             </section>
 
-            <section class="space-y-6 pt-4 border-t border-gray-200/60">
-                <div class="grid grid-cols-2 gap-4 text-center">
-                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                        <div class="text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-1">처리 URL</div>
-                        <div id="stat-urls" class="text-2xl font-black text-gray-800">0</div>
-                    </div>
-                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                        <div class="text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-1">총 댓글</div>
-                        <div id="stat-comments" class="text-2xl font-black text-gray-800">0</div>
-                    </div>
+            <section class="grid grid-cols-2 gap-4 text-center pt-2 border-t border-gray-200/60">
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-1">처리 URL</div>
+                    <div id="stat-urls" class="text-2xl font-black text-gray-800">0</div>
                 </div>
-
-                <div id="results-container" class="space-y-4">
-                    <div class="flex items-center justify-between px-1">
-                        <h2 class="text-lg font-black text-gray-800">수집 결과</h2>
-                        <span id="status-badge" class="px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-[11px] font-bold border border-gray-200 uppercase">대기 중</span>
-                    </div>
-                    <div id="results-list" class="space-y-6"></div>
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-1">총 댓글</div>
+                    <div id="stat-comments" class="text-2xl font-black text-gray-800">0</div>
                 </div>
             </section>
 
-        </main>
+            <section class="space-y-3">
+                <button id="run-btn" class="btn-hover w-full bg-red-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-red-200 flex items-center justify-center gap-2 text-base disabled:bg-gray-300 disabled:shadow-none transition-all">
+                    <i data-lucide="play" class="w-5 h-5"></i>
+                    <span id="run-btn-text">수집 시작</span>
+                </button>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="download-csv-btn" disabled class="btn-hover w-full bg-gray-800 text-white font-bold py-4 rounded-2xl shadow-md flex items-center justify-center gap-2 text-sm disabled:bg-gray-300 disabled:shadow-none transition-all">
+                        <i data-lucide="file-down" class="w-4 h-4"></i>
+                        <span>엑셀 저장(CSV)</span>
+                    </button>
+                    <button id="copy-btn" disabled class="btn-hover w-full bg-[#ff7f50] text-white font-bold py-4 rounded-2xl shadow-lg shadow-orange-200 flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:shadow-none transition-all">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                        <span>클립보드 복사</span>
+                    </button>
+                </div>
+            </section>
 
-        <footer class="p-6 bg-white/90 border-t border-gray-100 space-y-3 pb-10 sm:pb-8 backdrop-blur-md relative z-10 sm:rounded-b-[2.5rem]">
-            <button id="run-btn" class="btn-hover w-full bg-red-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-red-200 flex items-center justify-center gap-2 text-base disabled:bg-gray-300 disabled:shadow-none transition-all">
-                <i data-lucide="play" class="w-5 h-5"></i>
-                <span id="run-btn-text">수집 시작</span>
-            </button>
-            
-            <div class="grid grid-cols-2 gap-3">
-                <button id="download-csv-btn" disabled class="btn-hover w-full bg-gray-800 text-white font-bold py-4 rounded-2xl shadow-md flex items-center justify-center gap-2 text-sm disabled:bg-gray-300 disabled:shadow-none transition-all">
-                    <i data-lucide="file-down" class="w-4 h-4"></i>
-                    <span>엑셀 저장(CSV)</span>
-                </button>
-                <button id="copy-btn" disabled class="btn-hover w-full bg-[#ff7f50] text-white font-bold py-4 rounded-2xl shadow-lg shadow-orange-200 flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:shadow-none transition-all">
-                    <i data-lucide="copy" class="w-4 h-4"></i>
-                    <span>클립보드 복사</span>
-                </button>
-            </div>
-        </footer>
+            <section id="results-container" class="space-y-4 pt-4 border-t border-gray-200/60">
+                <div class="flex items-center justify-between px-1">
+                    <h2 class="text-lg font-black text-gray-800">수집 결과</h2>
+                    <span id="status-badge" class="px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-[11px] font-bold border border-gray-200 uppercase">대기 중</span>
+                </div>
+                <div id="results-list" class="space-y-6"></div>
+            </section>
+
+        </main>
     </div>
 
     <script>
