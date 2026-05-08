@@ -17,7 +17,7 @@
                 <i data-lucide="message-square-more" class="w-10 h-10 text-white"></i>
             </div>
             <h1 class="text-2xl font-black tracking-tighter mb-2 drop-shadow-md">REDDIT voice collector</h1>
-            <p class="text-red-50 text-sm font-semibold opacity-95">모바일 최적화 · 댓글 최대 1000개 수집</p>
+            <p class="text-red-50 text-sm font-semibold opacity-95">모바일 최적화 · 게시물 본문 및 모든 계층 수집</p>
         </header>
 
         <main class="flex-grow p-6 space-y-8 bg-white/50 relative z-0 overflow-y-auto pb-10 sm:pb-8 sm:rounded-b-[2.5rem]">
@@ -170,11 +170,11 @@
             return { comments: acc, moreBuckets };
         }
 
-        // 최대 수집 제한을 파라미터(maxNeeded)로 받도록 수정
-        async function fetchMoreChildren(postId, moreBuckets, maxNeeded) {
+        // 1000개 제한 기능을 제거하고 모든 내용을 가져오도록 복구
+        async function fetchMoreChildren(postId, moreBuckets) {
             const collected = [];
             const queue = [...moreBuckets];
-            while (queue.length > 0 && collected.length < maxNeeded) {
+            while (queue.length > 0) {
                 const bucket = queue.shift();
                 const url = `https://www.reddit.com/api/morechildren.json?api_type=json&raw_json=1&link_id=t3_${postId}&children=${bucket.children.slice(0, 50).join(',')}`;
                 try {
@@ -199,16 +199,10 @@
             const parsed = parseThingList(data?.[1]?.data?.children || [], [], []);
             let comments = [...parsed.comments];
             
-            // 1000개 제한 로직 적용
-            if (parsed.moreBuckets.length > 0 && comments.length < 1000) {
-                const remaining = 1000 - comments.length;
-                const extra = await fetchMoreChildren(postNode.id, parsed.moreBuckets, remaining);
+            // 모든 댓글 수집을 위해 조건 및 slice 제거 복구
+            if (parsed.moreBuckets.length > 0) {
+                const extra = await fetchMoreChildren(postNode.id, parsed.moreBuckets);
                 comments.push(...extra);
-            }
-            
-            // 안전 장치: 배열 자르기
-            if (comments.length > 1000) {
-                comments = comments.slice(0, 1000);
             }
 
             return {
