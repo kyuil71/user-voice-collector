@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;900&display=swap');
+
+/* 기본 변수 설정 */
+:root {
+    --primary: #ef4444; /* red-500 */
+    --primary-dark: #dc2626;
+    --bg-grad-start: #f8fafc;
+    --bg-grad-end: #e2e8f0;
+}
+
+body { 
+    font-family: 'Pretendard', sans-serif; 
+    -webkit-tap-highlight-color: transparent;
+    font-size: 16px; 
+    background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+/* 스마트폰 앱 느낌을 주기 위한 기본 스크롤바 숨김 */
+::-webkit-scrollbar { display: none; }
+input::placeholder { font-size: 15px; color: #9ca3af; }
+
+/* 글래스모피즘 컨테이너 */
+.glass-container {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+}
+
+/* 헤더 곡선 및 그라데이션 */
+.header-curve {
+    border-bottom-left-radius: 2.5rem;
+    border-bottom-right-radius: 2.5rem;
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+}
+
+/* 입력창 포커스 애니메이션 */
+.input-field {
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+.input-field:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.1);
+    border-color: var(--primary);
+}
+
+/* 버튼 클릭 애니메이션 */
+.btn-hover {
+    transition: transform 0.15s ease, box-shadow 0.3s ease;
+}
+.btn-hover:active {
+    transform: scale(0.96);
+}
+
+/* 상태 메시지 등장 애니메이션 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 스크롤바 커스텀 (테이블 내부 가로 스크롤용) */
+.scrollbar-thin::-webkit-scrollbar { display: block; width: 6px; height: 6px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+
+/* 격자형 테이블 레이아웃 및 작성자 폭 고정 */
+.comment-table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    background-color: transparent;
+}
+.comment-table th, .comment-table td {
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    padding: 10px 8px;
+    vertical-align: top;
+    word-break: break-all;
+}
+.col-author {
+    width: 55px; 
+    min-width: 55px;
+    max-width: 55px;
+    font-weight: 700;
+    font-size: 14px; 
+    color: #1e293b;
+}
+@media (min-width: 640px) {
+    .col-author {
+        width: 80px; 
+        min-width: 80px;
+        max-width: 80px;
+        font-size: 14px;
+    }
+}
