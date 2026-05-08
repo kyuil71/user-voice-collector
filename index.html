@@ -6,60 +6,12 @@
   <title>REDDIT voice collector</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-    
-    /* 스크롤바 커스텀 */
-    .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
-    .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
-    
-    /* 격자형 테이블 레이아웃 및 작성자 폭 고정 */
-    .comment-table {
-      table-layout: fixed;
-      width: 100%;
-      border-collapse: collapse;
-      background-color: white;
-    }
-    .comment-table th, .comment-table td {
-      border: 1px solid #e2e8f0;
-      padding: 10px 8px;
-      vertical-align: top;
-      word-break: break-all;
-    }
-    .col-author {
-      width: 55px; /* 모바일 기준 50% 축소 폭 */
-      min-width: 55px;
-      max-width: 55px;
-      font-weight: 700;
-      font-size: 14px; /* 최소 폰트 사이즈 준수 */
-      color: #1e293b;
-    }
-    @media (min-width: 640px) {
-      .col-author {
-        width: 80px; /* 데스크톱 기준 50% 축소 폭 */
-        min-width: 80px;
-        max-width: 80px;
-        font-size: 14px;
-      }
-    }
-    
-    /* 헤더 디자인: 곡선을 지우고 직선으로 변경 */
-    .header-rect {
-      border-bottom-left-radius: 0px;
-      border-bottom-right-radius: 0px;
-    }
-    
-    /* 그림자 효과 */
-    .card-shadow { box-shadow: 0 4px 25px rgba(0,0,0,0.06); }
-    .btn-active:active { transform: scale(0.98); }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body class="text-slate-900 min-h-screen pb-10">
 
-  <!-- 상단 헤더: 직선 형태로 수정하여 균형 확보 -->
-  <header class="max-w-xl mx-auto bg-[#d32f2f] text-white pt-10 pb-12 px-6 header-rect shadow-lg text-center">
-    <div class="inline-flex p-3 bg-white/20 rounded-2xl mb-4">
+  <header class="max-w-xl mx-auto text-white pt-10 pb-12 px-6 header-curve shadow-lg text-center">
+    <div class="inline-flex p-3 bg-white/20 rounded-2xl mb-4 backdrop-blur-sm">
       <i data-lucide="message-square-more" class="w-10 h-10"></i>
     </div>
     <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight uppercase">REDDIT voice collector</h1>
@@ -68,53 +20,49 @@
 
   <main class="max-w-xl mx-auto mt-6 px-4 space-y-6">
     
-    <!-- URL 입력 섹션 -->
-    <section class="bg-white rounded-[32px] p-6 card-shadow border border-slate-100">
+    <section class="glass-container rounded-[32px] p-6 border border-slate-100">
       <div class="flex items-center gap-3 mb-6">
         <h2 class="font-bold text-lg text-slate-800">Reddit URL 입력</h2>
       </div>
 
       <div class="space-y-3" id="url-container">
-        <input type="text" class="url-field w-full rounded-2xl border-none bg-slate-50 px-4 py-4 text-sm shadow-inner focus:ring-2 focus:ring-[#d32f2f] outline-none transition-all" placeholder="첫 번째 URL 입력">
-        <input type="text" class="url-field w-full rounded-2xl border-none bg-slate-50 px-4 py-4 text-sm shadow-inner focus:ring-2 focus:ring-[#d32f2f] outline-none transition-all" placeholder="두 번째 URL 입력">
-        <input type="text" class="url-field w-full rounded-2xl border-none bg-slate-50 px-4 py-4 text-sm shadow-inner focus:ring-2 focus:ring-[#d32f2f] outline-none transition-all" placeholder="세 번째 URL 입력">
-        <input type="text" class="url-field w-full rounded-2xl border-none bg-slate-50 px-4 py-4 text-sm shadow-inner focus:ring-2 focus:ring-[#d32f2f] outline-none transition-all" placeholder="네 번째 URL 입력">
-        <input type="text" class="url-field w-full rounded-2xl border-none bg-slate-50 px-4 py-4 text-sm shadow-inner focus:ring-2 focus:ring-[#d32f2f] outline-none transition-all" placeholder="다섯 번째 URL 입력">
+        <input type="text" class="url-field input-field w-full rounded-2xl bg-slate-100/50 px-4 py-4 text-sm shadow-inner outline-none" placeholder="첫 번째 URL 입력">
+        <input type="text" class="url-field input-field w-full rounded-2xl bg-slate-100/50 px-4 py-4 text-sm shadow-inner outline-none" placeholder="두 번째 URL 입력">
+        <input type="text" class="url-field input-field w-full rounded-2xl bg-slate-100/50 px-4 py-4 text-sm shadow-inner outline-none" placeholder="세 번째 URL 입력">
+        <input type="text" class="url-field input-field w-full rounded-2xl bg-slate-100/50 px-4 py-4 text-sm shadow-inner outline-none" placeholder="네 번째 URL 입력">
+        <input type="text" class="url-field input-field w-full rounded-2xl bg-slate-100/50 px-4 py-4 text-sm shadow-inner outline-none" placeholder="다섯 번째 URL 입력">
       </div>
 
-      <!-- 수집 요약 정보 -->
-      <div class="mt-8 pt-6 border-t border-slate-100 grid grid-cols-2 gap-4 text-center">
-        <div class="bg-slate-50/50 p-3 rounded-2xl">
+      <div class="mt-8 pt-6 border-t border-slate-200/60 grid grid-cols-2 gap-4 text-center">
+        <div class="bg-slate-100/50 p-3 rounded-2xl">
           <div class="text-sm text-slate-400 font-bold uppercase tracking-wider">처리 URL</div>
           <div id="stat-urls" class="text-xl font-black text-slate-800">0</div>
         </div>
-        <div class="bg-slate-50/50 p-3 rounded-2xl">
+        <div class="bg-slate-100/50 p-3 rounded-2xl">
           <div class="text-sm text-slate-400 font-bold uppercase tracking-wider">총 댓글</div>
           <div id="stat-comments" class="text-xl font-black text-slate-800">0</div>
         </div>
       </div>
     </section>
 
-    <!-- 액션 버튼 섹션 -->
     <div class="space-y-3">
-      <button id="run-btn" class="w-full inline-flex items-center justify-center gap-3 rounded-2xl bg-[#d32f2f] hover:bg-[#b71c1c] text-white font-bold py-5 shadow-lg shadow-red-100 transition-all btn-active disabled:bg-slate-300">
+      <button id="run-btn" class="w-full inline-flex items-center justify-center gap-3 rounded-2xl bg-red-500 hover:bg-red-600 text-white font-bold py-5 shadow-lg shadow-red-200 btn-hover disabled:bg-slate-300 disabled:shadow-none">
         <i data-lucide="play" class="w-6 h-6"></i>
         <span id="run-btn-text" class="text-sm md:text-base">수집 시작</span>
       </button>
       
       <div class="grid grid-cols-2 gap-3">
-        <button id="download-csv-btn" disabled class="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 hover:bg-black text-white font-bold py-5 transition-all btn-active disabled:bg-slate-300 shadow-md">
+        <button id="download-csv-btn" disabled class="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-800 hover:bg-slate-900 text-white font-bold py-5 btn-hover disabled:bg-slate-300 shadow-md disabled:shadow-none">
           <i data-lucide="file-down" class="w-4 h-4"></i>
           <span class="text-sm md:text-base">엑셀 저장(CSV)</span>
         </button>
-        <button id="copy-btn" disabled class="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold py-5 transition-all btn-active disabled:opacity-50 shadow-md">
+        <button id="copy-btn" disabled class="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold py-5 btn-hover disabled:opacity-50 shadow-md disabled:shadow-none">
           <i data-lucide="copy" class="w-4 h-4"></i>
           <span class="text-sm md:text-base">클립보드 복사</span>
         </button>
       </div>
     </div>
 
-    <!-- 결과 리스트 섹션 -->
     <div id="results-container" class="space-y-6 pt-2">
       <div class="flex items-center justify-between px-2">
         <h2 class="text-lg font-black text-slate-800">수집 결과</h2>
@@ -143,20 +91,14 @@
       summary: { inputCount: 0, successCount: 0, failCount: 0, totalComments: 0 }
     };
 
-    function nowText() { return new Date().toLocaleString('ko-KR'); }
-    function formatEpoch(epochSec) {
-      if (!epochSec) return '';
-      const d = new Date(epochSec * 1000);
-      return isNaN(d.getTime()) ? '' : d.toLocaleString('ko-KR');
-    }
     function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
     function setBadge(text, tone = 'neutral') {
       const toneMap = {
         neutral: 'bg-slate-100 text-slate-500 border-slate-200',
-        running: 'bg-blue-50 text-blue-700 border-blue-100',
-        success: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-        danger: 'bg-red-50 text-red-700 border-red-100'
+        running: 'bg-blue-50 text-blue-700 border-blue-200',
+        success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        danger: 'bg-red-50 text-red-700 border-red-200'
       };
       statusBadge.className = `px-3 py-1 rounded-full text-sm font-bold border ${toneMap[tone]} uppercase`;
       statusBadge.textContent = text;
@@ -264,21 +206,22 @@
 
     function renderResult(item) {
       const wrap = document.createElement('div');
-      wrap.className = 'bg-white rounded-[32px] p-5 card-shadow border border-slate-100 overflow-hidden';
+      // 결과 컨테이너에 glass-container와 animate-fade-in 클래스를 적용하여 부드럽게 나타나도록 했습니다.
+      wrap.className = 'glass-container rounded-[32px] p-6 border border-slate-100 overflow-hidden animate-fade-in mb-6';
       wrap.innerHTML = `
-        <div class="mb-4">
-          <h3 class="font-black text-base text-slate-800 leading-snug">${item.title}</h3>
-          <p class="text-sm text-slate-400 font-bold mt-1 uppercase tracking-tight">r/${item.subreddit} · @${item.author} · 댓글 ${item.comments.length}개</p>
+        <div class="mb-5">
+          <h3 class="font-black text-lg text-slate-800 leading-snug">${item.title}</h3>
+          <p class="text-sm text-slate-400 font-bold mt-2 uppercase tracking-tight">r/${item.subreddit} · @${item.author} · 댓글 ${item.comments.length}개</p>
         </div>
         ${item.body ? `
-          <div class="bg-slate-50 border border-slate-200/50 rounded-2xl p-3 text-sm text-slate-600 mb-4 whitespace-pre-wrap break-words italic">
-            <strong class="block mb-1 not-italic text-[#d32f2f]">[게시물 본문]</strong>
+          <div class="bg-slate-50/80 border border-slate-200/50 rounded-2xl p-4 text-sm text-slate-600 mb-5 whitespace-pre-wrap break-words italic shadow-inner">
+            <strong class="block mb-2 not-italic text-red-500">[게시물 본문]</strong>
             ${item.body}
           </div>
         ` : ''}
-        <div class="overflow-x-auto scrollbar-thin border border-slate-100 rounded-xl">
+        <div class="overflow-x-auto scrollbar-thin border border-slate-200/60 rounded-xl bg-white/50">
           <table class="comment-table">
-            <thead class="bg-slate-50/50 text-slate-400 text-sm uppercase font-black">
+            <thead class="bg-slate-100/50 text-slate-500 text-sm uppercase font-black">
               <tr><th class="col-author text-left">작성자</th><th class="text-left">내용</th></tr>
             </thead>
             <tbody class="text-sm">
@@ -286,14 +229,14 @@
                 <tr>
                   <td class="col-author text-slate-900">${c.author}</td>
                   <td class="text-slate-700">
-                    <div style="margin-left: ${Math.min(c.depth * 6, 40)}px" class="${c.depth > 0 ? 'border-l-2 border-slate-200 pl-2' : ''} whitespace-pre-wrap">${c.body}</div>
+                    <div style="margin-left: ${Math.min(c.depth * 6, 40)}px" class="${c.depth > 0 ? 'border-l-2 border-slate-300 pl-2' : ''} whitespace-pre-wrap">${c.body}</div>
                   </td>
                 </tr>
               `).join('')}
             </tbody>
           </table>
         </div>
-        ${item.comments.length > 30 ? `<p class="mt-3 text-sm text-slate-300 text-center font-bold italic">* 상위 30개 댓글 미리보기 중</p>` : ''}
+        ${item.comments.length > 30 ? `<p class="mt-4 text-sm text-slate-400 text-center font-bold italic">* 상위 30개 댓글 미리보기 중</p>` : ''}
       `;
       resultsList.appendChild(wrap);
     }
