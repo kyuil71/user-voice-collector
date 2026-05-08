@@ -13,20 +13,22 @@ body {
     -webkit-tap-highlight-color: transparent;
     font-size: 16px; 
     background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
-    background-attachment: fixed;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* 스마트폰 앱 느낌을 주기 위한 기본 스크롤바 숨김 */
+/* 스마트폰 앱 느낌을 주기 위한 스크롤바 숨김 (메인 컨테이너) */
 ::-webkit-scrollbar { display: none; }
 input::placeholder { font-size: 15px; color: #9ca3af; }
 
 /* 글래스모피즘 컨테이너 */
 .glass-container {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
 }
 
 /* 헤더 곡선 및 그라데이션 */
@@ -39,7 +41,6 @@ input::placeholder { font-size: 15px; color: #9ca3af; }
 /* 입력창 포커스 애니메이션 */
 .input-field {
     transition: all 0.3s ease;
-    border: 1px solid transparent;
 }
 .input-field:focus {
     transform: translateY(-2px);
@@ -64,7 +65,7 @@ input::placeholder { font-size: 15px; color: #9ca3af; }
     animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* 스크롤바 커스텀 (테이블 내부 가로 스크롤용) */
+/* 내부 결과창의 테이블 스크롤바 (이 부분만 보이도록 설정) */
 .scrollbar-thin::-webkit-scrollbar { display: block; width: 6px; height: 6px; }
 .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
 
