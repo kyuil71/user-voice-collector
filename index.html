@@ -138,16 +138,15 @@
             } catch { return null; }
         }
 
+        // 새롭게 구축하신 개인 전용 우회 서버를 사용하도록 수정된 부분입니다.
         async function fetchJsonWithFallback(targetUrl) {
-            const proxies = [
-                targetUrl,
-                `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`
-            ];
-            for (const url of proxies) {
-                try {
-                    const res = await fetch(url);
-                    if (res.ok) return await res.json();
-                } catch {}
+            const MY_PROXY_URL = 'https://crimson.kyuil71.workers.dev/?url=';
+            
+            try {
+                const res = await fetch(`${MY_PROXY_URL}${encodeURIComponent(targetUrl)}`);
+                if (res.ok) return await res.json();
+            } catch (e) {
+                console.error("프록시 서버 응답 오류:", e);
             }
             throw new Error('데이터 응답 오류');
         }
@@ -170,7 +169,6 @@
             return { comments: acc, moreBuckets };
         }
 
-        // 1000개 제한 기능을 제거하고 모든 내용을 가져오도록 복구
         async function fetchMoreChildren(postId, moreBuckets) {
             const collected = [];
             const queue = [...moreBuckets];
@@ -199,7 +197,6 @@
             const parsed = parseThingList(data?.[1]?.data?.children || [], [], []);
             let comments = [...parsed.comments];
             
-            // 모든 댓글 수집을 위해 조건 및 slice 제거 복구
             if (parsed.moreBuckets.length > 0) {
                 const extra = await fetchMoreChildren(postNode.id, parsed.moreBuckets);
                 comments.push(...extra);
